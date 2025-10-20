@@ -1,0 +1,90 @@
+{
+  "source": "zap+recon",
+  "zap_findings": [],
+  "reconnaissance": {
+    "open_ports": [
+      {
+        "port": 22,
+        "service": "ssh",
+        "version": "2.9p2"
+      },
+      {
+        "port": 80,
+        "service": "http",
+        "version": "1.3.20"
+      },
+      {
+        "port": 111,
+        "service": "rpcbind",
+        "version": "2"
+      },
+      {
+        "port": 139,
+        "service": "netbios-ssn",
+        "version": ""
+      },
+      {
+        "port": 443,
+        "service": "https",
+        "version": ""
+      }
+    ],
+    "services": [
+      {
+        "service": "ssh",
+        "port": 22
+      },
+      {
+        "service": "http",
+        "port": 80
+      },
+      {
+        "service": "rpcbind",
+        "port": 111
+      },
+      {
+        "service": "netbios-ssn",
+        "port": 139
+      },
+      {
+        "service": "https",
+        "port": 443
+      }
+    ],
+    "service_versions": [
+      {
+        "service": "ssh",
+        "version": "2.9p2",
+        "port": 22
+      },
+      {
+        "service": "http",
+        "version": "1.3.20",
+        "port": 80
+      },
+      {
+        "service": "rpcbind",
+        "version": "2",
+        "port": 111
+      }
+    ],
+    "subdomains": [],
+    "subdirectories": [],
+    "ip_addresses": [
+      "192.168.206.129"
+    ],
+    "hostnames": [
+      "KIOPTRIX"
+    ],
+    "ssl_certs": [
+      {
+        "subject": "None",
+        "issuer": "None",
+        "not_before": "None",
+        "not_after": "None",
+        "status": null,
+        "error": "Error retrieving SSL certificate for 192.168.206.129: [SSL: SSLV3_ALERT_HANDSHAKE_FAILURE] sslv3 alert handshake failure (_ssl.c:1032)"
+      }
+    ]
+  }
+}

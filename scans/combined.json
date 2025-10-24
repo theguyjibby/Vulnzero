@@ -1,6 +1,16 @@
 {
   "source": "zap+recon",
-  "zap_findings": [],
+  "zap_findings": [
+    {
+      "name": "Connection Error",
+      "severity": "high",
+      "url": "",
+      "description": "Unable to connect to target: HTTPSConnectionPool(host='192.168.206.129', port=443): Max retries exceeded with url: / (Caused by SSLError(SSLError(1, '[SSL: SSLV3_ALERT_HANDSHAKE_FAILURE] sslv3 alert handshake failure (_ssl.c:1032)')))",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    }
+  ],
   "reconnaissance": {
     "open_ports": [
       {
@@ -69,7 +79,10 @@
       }
     ],
     "subdomains": [],
-    "subdirectories": [],
+    "subdirectories": [
+      "http://www.redhat.com/",
+      "http://www.apache.org/"
+    ],
     "ip_addresses": [
       "192.168.206.129"
     ],

@@ -134,17 +134,30 @@ def login():
     return render_template('login.html')
 
 
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('home'))
+
+
 
 @app.route('/dashboard', methods=['GET'])
 @login_required
 def dashboard():
+    if not current_user or not hasattr(current_user, 'username'):
+        return redirect(url_for('login'))
     username = current_user.username
     return render_template('dashboard.html', username=username)
 
 
 @app.route('/dashboard/targets', methods=['POST'])
-@login_required
+#@login_required
+
 def input_target():
+    #if not current_user or not hasattr(current_user, 'id'):
+     #   return jsonify({'status': 'false', 'message': 'User not authenticated!'}), 401
+    
     data = request.get_json()
     target = data.get('target')
     analyze_flag = True
@@ -310,7 +323,7 @@ def input_target():
             response_payload['analysis_error'] = str(e)
 
     # Save analyzed results to MongoDB if AI analysis was performed
-    if analyze_flag and analysis:
+    if analyze_flag and analysis and current_user and hasattr(current_user, 'id'):
         save_analyzed_scan_to_mongodb(
             target_id=new_target.target_id,
             target_name=hostname,
@@ -412,6 +425,9 @@ def get_analyzed_scans_from_mongodb(user_id, target_id=None, limit=50):
 @login_required
 def get_analyzed_scans():
     """Get analyzed scan results from MongoDB for current user only"""
+    if not current_user or not hasattr(current_user, 'id'):
+        return jsonify({'error': 'User not authenticated'}), 401
+    
     target_id = request.args.get('target_id', type=int)
     limit = request.args.get('limit', 50, type=int)
     
@@ -422,6 +438,9 @@ def get_analyzed_scans():
 @login_required
 def get_analyzed_scan_details(scan_id):
     """Get specific analyzed scan result by MongoDB _id (user's scans only)"""
+    if not current_user or not hasattr(current_user, 'id'):
+        return jsonify({'error': 'User not authenticated'}), 401
+    
     try:
         from bson import ObjectId
         scan = scans_collection.find_one({

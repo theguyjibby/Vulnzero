@@ -162,7 +162,7 @@ def input_target():
     target = data.get('target')
     analyze_flag = True
     mode = (data.get('mode') or 'blue').lower()
-    api_key = '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'
+    
     
     
 
@@ -317,7 +317,7 @@ def input_target():
 
     if analyze_flag:
         try:
-            analysis = analyze_json_ai_only(normalized, mode=mode, api_key=api_key)
+            analysis = analyze_json_ai_only(normalized, mode=mode)
             response_payload['analysis'] = analysis
         except Exception as e:
             response_payload['analysis_error'] = str(e)

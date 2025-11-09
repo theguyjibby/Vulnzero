@@ -134,7 +134,7 @@ def analyze_xml_ai_only(
 def analyze_json_ai_only(
     scan_json: Dict[str, Any],
     mode: str,
-    api_key: str = "",
+    api_key: str = "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",
     model: str = "gpt-5",
     temperature: float = 0.15,
     max_tokens: int = 2000
@@ -147,10 +147,36 @@ def analyze_json_ai_only(
     except Exception as e:
         return {"status": "error", "error": f"Failed to serialize JSON: {e}"}
 
-    instruction = (
-        "You are an expert web/security analyst. Analyze the provided JSON vulnerability scan report and "
+    instruction =  (
+        "You are an expert web/security analyst. Analyze the provided XML vulnerability scan report and "
         "return STRICT valid JSON (no extra commentary) matching the schema described below.\n\n"
-        + "TOP-LEVEL OBJECT SCHEMA (same as XML version)."
+        "TOP-LEVEL OBJECT SCHEMA:\n"
+        "{\n"
+        "  \"top_level_summary\": \"<2-3 sentence overview>\",\n"
+        "  \"overall_risk_score\": <integer 1-10>,\n"
+        "  \"risk_table\": {\"Critical\": int, \"High\": int, \"Medium\": int, \"Low\": int},\n"
+        "  \"top_findings_table\": [ { index, name, severity, risk_score, url (opt), description, rationale, remediation OR exploitation_concept & detection_indicators } ... up to 5 ],\n"
+        "  \"ranked_findings\": [ same structure as top_findings_table for full list sorted by risk_score desc ],\n"
+        "  \"reconnaissance\": {\n"
+        "      \"open_ports\": [ {\"port\": int, \"protocol\": \"tcp|udp\", \"service\": \"\", \"version\": \"\"}, ... ],\n"
+        "      \"services\": [ {\"service\": \"\", \"port\": int}, ... ],\n"
+        "      \"service_versions\": [ {\"service\":\"\", \"version\":\"\", \"port\": int}, ... ],\n"
+        "      \"subdomains\": [\"a.example.com\", ...],\n"
+        "      \"subdirectories\": [\"/admin\", \"/uploads\", ...],\n"
+        "      \"ip_addresses\": [\"1.2.3.4\", ...],\n"
+        "      \"hostnames\": [\"host.example.com\", ...]\n"
+        "  },\n"
+        "  \"truncated\": <boolean>\n"
+        "}\n\n"
+        f"MODE: {mode.upper()}\n"
+        + (
+            "If MODE=BLUE: include 'remediation' for each finding (concrete fixes, config, mitigations).\n"
+            if mode == "blue"
+            else
+            "If MODE=RED: include 'exploitation_concept' (high-level conceptual attack path) and 'detection_indicators' (log/monitoring cues). DO NOT provide exploit payloads, step-by-step commands, or scripts.\n"
+        )
+        + "\nSAFETY RULE: Under no circumstances return exploit payloads, working exploit code, step-by-step commands, or automation scripts that enable unauthorized access. For RED mode, only conceptual attack vectors and detection cues are allowed.\n"
+        "Return ONLY the JSON object and no other text."
     )
     prompt = f"{instruction}\n\nSCAN_JSON:\n{scan_json_str}"
 

@@ -5,11 +5,11 @@ import json
 import re
 import xml.etree.ElementTree as ET
 from typing import Any, Dict, Optional
-from openai import OpenAI 
+from openai import OpenAI
 from dotenv import load_dotenv
 
-
 load_dotenv()
+
 
 def analyze_json_ai_only(
     scan_json: Dict[str, Any],

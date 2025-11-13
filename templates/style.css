@@ -1,0 +1,30 @@
+@theme {
+  --color-clifford: #da373d;
+  --color-text: #030303;
+  --color-purp: #7257ff;
+}
+* {
+  font-family: "Parkinsans", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
+.login-bg {
+  background: url(./images/Dimly\ Lit\ Server\ Room.jpg);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.register-bg {
+  background: url(./images//Abstract\ Server\ Room.jpg);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.bg-main{
+  background: url(./images//quad.svg);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}

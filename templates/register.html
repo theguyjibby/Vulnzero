@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VulnZero - Register</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&family=Parkinsans:wght@300..800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <style type="text/tailwindcss">
+    @theme {
+      --color-clifford: #da373d;
+      --color-text: #030303;
+      --color-purp: #7257ff;
+    }
+  </style>
+  <body class="bg-white">
+    <section class="flex h-screen">
+      <div class="basis-2/5 bg-red-400 register-bg"></div>
+
+      <!-- Main -->
+      <div class="basis-full flex flex-col justify-center items-center bg-main">
+        <h1 class="text-3xl font-semibold">
+          Welcome to <span>VulnZero</span> - Register
+        </h1>
+        <div id="message"></div>
+        <form class="flex w-1/3 flex-col my-5" id="registerForm">
+          <input
+            class="border bg-white border-neutral-400 px-3 py-1.5 rounded-md w-full"
+            type="text"
+            id="username"
+            placeholder="Username"
+            required
+          />
+          <input
+            class="border bg-white border-neutral-400 px-3 py-1.5 rounded-md w-full my-5"
+            type="email"
+            id="email"
+            placeholder="Email"
+            required
+          />
+          <input
+            type="password"
+            class="border bg-white border-neutral-400 px-3 py-1.5 rounded-md w-full"
+            id="password"
+            placeholder="Password (min 6 characters)"
+            required
+          />
+          <button
+            class="mt-10 rounded-xl bg-purp px-8 py-3 text-white"
+            type="submit"
+          >
+            Register
+          </button>
+        </form>
+        <p class="color-text">
+          Already have an account?
+          <a class="text-sm text-purp" href="/templates/login.html">
+            Login here</a
+          >
+        </p>
+      </div>
+    </section>
+    <script>
+      document
+        .getElementById("registerForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const username = document.getElementById("username").value;
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+
+          try {
+            const response = await fetch("/register", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ username, email, password }),
+            });
+
+            if (!response.ok) {
+              // Handle HTTP errors
+              if (response.status === 405) {
+                throw new Error(
+                  "Method not allowed. Please ensure the server is running and the route accepts POST requests."
+                );
+              }
+              const errorData = await response
+                .json()
+                .catch(() => ({ message: `HTTP ${response.status} Error` }));
+              throw new Error(
+                errorData.message || `HTTP ${response.status} Error`
+              );
+            }
+
+            const data = await response.json();
+            const messageDiv = document.getElementById("message");
+            if (data.status === "true") {
+              messageDiv.className = "message success";
+              messageDiv.textContent = data.message;
+              setTimeout(
+                () => (window.location.href = "/tempaltes/login.html"),
+                2000
+              );
+            } else {
+              messageDiv.className = "message error";
+              messageDiv.textContent = data.message;
+            }
+          } catch (error) {
+            const messageDiv = document.getElementById("message");
+            messageDiv.className = "message error";
+            messageDiv.textContent =
+              error.message || "An error occurred. Please try again.";
+            console.error("Registration error:", error);
+          }
+        });
+    </script>
+  </body>
+</html>

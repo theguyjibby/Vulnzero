@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VulnZero - Dashboard</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .container {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #333;
+      }
+      .nav {
+        margin: 20px 0;
+      }
+      .nav a {
+        margin-right: 20px;
+        padding: 10px 20px;
+        background: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+      }
+      .nav a:hover {
+        background: #0056b3;
+      }
+      .scan-form {
+        margin: 20px 0;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 5px;
+      }
+      input,
+      select {
+        padding: 10px;
+        margin: 5px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+      button {
+        padding: 10px 20px;
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #218838;
+      }
+      .results {
+        margin-top: 20px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Dashboard - Welcome, {{ username }}!</h1>
+      <div class="nav">
+        <a href="/">Home</a>
+        <a href="/logout">Logout</a>
+      </div>
+      <div class="scan-form">
+        <h2>New Vulnerability Scan</h2>
+        <form id="scanForm">
+          <input
+            type="text"
+            id="target"
+            placeholder="Target (IP or Domain)"
+            required
+          />
+          <select id="mode">
+            <option value="blue">Blue Team Mode</option>
+            <option value="red">Red Team Mode</option>
+          </select>
+          <button type="submit">Start Scan</button>
+        </form>
+        <div id="scanMessage"></div>
+      </div>
+      <div class="results" id="results"></div>
+    </div>
+    <script>
+      document
+        .getElementById("scanForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const target = document.getElementById("target").value;
+          const mode = document.getElementById("mode").value;
+          const messageDiv = document.getElementById("scanMessage");
+          const resultsDiv = document.getElementById("results");
+
+          messageDiv.textContent = "Scanning... This may take a few minutes.";
+          resultsDiv.innerHTML = "";
+
+          try {
+            const response = await fetch("/dashboard/targets", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ target, mode }),
+            });
+            const data = await response.json();
+            if (data.status === "true") {
+              messageDiv.textContent = "Scan completed successfully!";
+              resultsDiv.innerHTML = `<h3>Scan Results</h3>
+                        <p><strong>Target:</strong> ${data.target}</p>
+                        <p><strong>IP:</strong> ${data.ip}</p>
+                        <p><strong>Subdomains Found:</strong> ${
+                          data.subdomains_found
+                        }</p>
+                        <p><strong>Subdirectories Found:</strong> ${
+                          data.subdirectories_found
+                        }</p>
+                        <p><strong>ZAP Alerts:</strong> ${
+                          data.zap_alerts_count
+                        }</p>
+                        <p><strong>Total Vulnerabilities:</strong> ${
+                          data.total_vulnerabilities
+                        }</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } else {
+              messageDiv.textContent = "Error: " + data.message;
+            }
+          } catch (error) {
+            messageDiv.textContent = "Error: " + error.message;
+          }
+        });
+    </script>
+  </body>
+</html>
+

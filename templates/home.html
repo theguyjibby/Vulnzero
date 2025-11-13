@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&family=Parkinsans:wght@300..800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
+    <title>VulnZero - Home</title>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-clifford: #da373d;
+        --color-text: #030303;
+        --color-purp: #7257ff;
+      }
+    </style>
+  </head>
+  <body class="bg-white">
+    <div
+      class="container flex h-screen bg-main flex-col justify-center items-center"
+    >
+      <h1 class="text-3xl font-medium">
+        <span class="text-purp">VulnZero</span> - Vulnerability Scanner
+      </h1>
+      <p class="mt-5">
+        Welcome to VulnZero, a comprehensive vulnerability scanning and analysis
+        platform.
+      </p>
+      <div class="nav flex gap-8 my-10">
+        <a
+          class="bg-purp text-white px-8 py-2 rounded-full"
+          href="/templates/login.html"
+          >Login</a
+        >
+        <a
+          class="bg-text text-white px-8 py-2 rounded-full"
+          href="/templates/register.html"
+          >Register</a
+        >
+      </div>
+      <img
+        class="h-64 rounded"
+        src="./images/Robotic Hand with Laptop.jpg"
+        alt=""
+      />
+    </div>
+  </body>
+</html>

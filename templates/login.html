@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VulnZero - Login</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&family=Parkinsans:wght@300..800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+   <style type="text/tailwindcss">
+    @theme {
+      --color-clifford: #da373d;
+      --color-text: #030303;
+      --color-purp: #7257ff;
+    }
+  </style>
+  <body class="bg-white">
+    <section class="flex h-screen">
+      <!-- Image bg -->
+      <div class="basis-2/5 bg-red-400 login-bg"></div>
+
+      <!-- Main -->
+      <div class="basis-full flex flex-col justify-center items-center bg-main">
+        <h1 class="text-3xl font-semibold">Login to VulnZero</h1>
+        <div id="message"></div>
+        <form class="flex w-1/3 flex-col my-5" id="loginForm">
+          <input
+            class="border bg-white border-neutral-400 px-3 py-1.5 rounded-md w-full"
+            type="text"
+            id="username"
+            placeholder="Username"
+            required
+          />
+          <input
+            class="border bg-white border-neutral-400 px-3 mt-5 py-1.5 rounded-md w-full"
+            type="password"
+            id="password"
+            placeholder="Password"
+            required
+          />
+          <button
+            class="mt-10 rounded-xl bg-purp px-8 py-3 text-white"
+            type="submit"
+          >
+            Login
+          </button>
+        </form>
+        <p>
+          Don't have an account?<a
+            class="text-sm text-purp"
+            href="/templates/register.html"
+          >
+            Register here</a
+          >
+        </p>
+        <!-- <p><a class="text-sm text-purp" href="/templates/home.html">Back to Home</a></p> -->
+      </div>
+    </section>
+    <script>
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const username = document.getElementById("username").value;
+          const password = document.getElementById("password").value;
+          const response = await fetch("/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password }),
+          });
+          const data = await response.json();
+          const messageDiv = document.getElementById("message");
+          if (data.status === "true") {
+            messageDiv.className = "message success";
+            messageDiv.textContent = data.message;
+            setTimeout(() => (window.location.href = "/dashboard"), 1000);
+          } else {
+            messageDiv.className = "message error";
+            messageDiv.textContent = data.message;
+          }
+        });
+    </script>
+  </body>
+</html>

@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, flash
+from flask_cors import CORS
 import os
 import json
 import threading
@@ -19,6 +20,7 @@ from prompt_normalizer import normalize_zap_and_recon_to_json, write_json, build
 from AI_analyzer import analyze_json_ai_only
 
 app = Flask(__name__)
+CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
 
 app.config['SECRET_KEY'] = 'your_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///vulnZero.db'
@@ -93,10 +95,28 @@ def load_user(user_id):
 def home():
     return render_template('home.html')
 
+@app.route('/test', methods=['GET', 'POST', 'OPTIONS'])
+def test():
+    """Test endpoint to verify server is working"""
+    if request.method == 'OPTIONS':
+        return '', 200
+    return jsonify({
+        'status': 'success',
+        'method': request.method,
+        'message': 'Server is working!'
+    }), 200
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        data = request.get_json()
+        try:
+            data = request.get_json(force=True)
+        except Exception as e:
+            return jsonify({'status': 'false', 'message': f'Invalid JSON: {str(e)}'}), 400
+        
+        if not data:
+            return jsonify({'status': 'false', 'message': 'No data provided'}), 400
+            
         username = data.get('username')
         email = data.get('email')
         password = data.get('password')
@@ -122,7 +142,14 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        data = request.get_json()
+        try:
+            data = request.get_json(force=True)
+        except Exception as e:
+            return jsonify({'status': 'false', 'message': f'Invalid JSON: {str(e)}'}), 400
+        
+        if not data:
+            return jsonify({'status': 'false', 'message': 'No data provided'}), 400
+            
         username = data.get('username')
         password = data.get('password')
 
@@ -153,12 +180,17 @@ def dashboard():
 
 @app.route('/dashboard/targets', methods=['POST'])
 #@login_required
-
 def input_target():
     #if not current_user or not hasattr(current_user, 'id'):
      #   return jsonify({'status': 'false', 'message': 'User not authenticated!'}), 401
     
-    data = request.get_json()
+    try:
+        data = request.get_json(force=True)
+    except Exception as e:
+        return jsonify({'status': 'false', 'message': f'Invalid JSON: {str(e)}'}), 400
+    
+    if not data:
+        return jsonify({'status': 'false', 'message': 'No data provided'}), 400
     target = data.get('target')
     analyze_flag = True
     mode = (data.get('mode') or 'blue').lower()

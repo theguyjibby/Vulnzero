@@ -14,7 +14,7 @@
     />
     <link rel="stylesheet" href="./style.css" />
   </head>
-   <style type="text/tailwindcss">
+  <style type="text/tailwindcss">
     @theme {
       --color-clifford: #da373d;
       --color-text: #030303;
@@ -64,26 +64,53 @@
       </div>
     </section>
     <script>
+      // Flask server URL - change this if your Flask server runs on a different port
+      const API_BASE_URL = "http://127.0.0.1:5000";
+
       document
         .getElementById("loginForm")
         .addEventListener("submit", async function (e) {
           e.preventDefault();
           const username = document.getElementById("username").value;
           const password = document.getElementById("password").value;
-          const response = await fetch("/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, password }),
-          });
-          const data = await response.json();
           const messageDiv = document.getElementById("message");
-          if (data.status === "true") {
-            messageDiv.className = "message success";
-            messageDiv.textContent = data.message;
-            setTimeout(() => (window.location.href = "/dashboard"), 1000);
-          } else {
+
+          try {
+            const response = await fetch(`${API_BASE_URL}/login`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({ username, password }),
+            });
+
+            if (!response.ok) {
+              const errorText = await response.text();
+              console.error("Response error:", response.status, errorText);
+              messageDiv.className = "message error";
+              messageDiv.textContent = `Error ${response.status}: ${
+                errorText || response.statusText
+              }`;
+              return;
+            }
+
+            const data = await response.json();
+            console.log("Login response:", data);
+
+            if (data.status === "true") {
+              messageDiv.className = "message success";
+              messageDiv.textContent = data.message;
+              setTimeout(
+                () => (window.location.href = `/templates/dashboard.html`),
+                1000
+              );
+            } else {
+              messageDiv.className = "message error";
+              messageDiv.textContent = data.message;
+            }
+          } catch (error) {
+            console.error("Login error:", error);
             messageDiv.className = "message error";
-            messageDiv.textContent = data.message;
+            messageDiv.textContent = `Network error: ${error.message}. Make sure the Flask server is running.`;
           }
         });
     </script>

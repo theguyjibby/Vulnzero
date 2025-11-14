@@ -4,96 +4,74 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>VulnZero - Dashboard</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-        background-color: #f5f5f5;
-      }
-      .container {
-        background: white;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      }
-      h1 {
-        color: #333;
-      }
-      .nav {
-        margin: 20px 0;
-      }
-      .nav a {
-        margin-right: 20px;
-        padding: 10px 20px;
-        background: #007bff;
-        color: white;
-        text-decoration: none;
-        border-radius: 5px;
-      }
-      .nav a:hover {
-        background: #0056b3;
-      }
-      .scan-form {
-        margin: 20px 0;
-        padding: 20px;
-        background: #f8f9fa;
-        border-radius: 5px;
-      }
-      input,
-      select {
-        padding: 10px;
-        margin: 5px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-      }
-      button {
-        padding: 10px 20px;
-        background: #28a745;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-      }
-      button:hover {
-        background: #218838;
-      }
-      .results {
-        margin-top: 20px;
-        padding: 20px;
-        background: #f8f9fa;
-        border-radius: 5px;
-      }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&family=Parkinsans:wght@300..800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
   </head>
-  <body>
-    <div class="container">
-      <h1>Dashboard - Welcome, {{ username }}!</h1>
-      <div class="nav">
-        <a href="/">Home</a>
-        <a href="/logout">Logout</a>
+  <style type="text/tailwindcss">
+    @theme {
+      --color-clifford: #da373d;
+      --color-text: #030303;
+      --color-purp: #7257ff;
+    }
+  </style>
+  <body class="bg-white flex flex-col justify-between p-5 bg-main">
+    <nav class="flex justify-between items-center">
+      <h1 class="text-3xl font-semibold text-purp">VulnZero</h1>
+      <div class="flex gap-4 items-center">
+        <h1>Dashboard - Welcome,</h1>
+        <button
+          class="bg-text text-white px-6 py-2 rounded-lg"
+          onclick="window.location.href='/templates/home.html'"
+        >
+          Logout
+        </button>
       </div>
-      <div class="scan-form">
-        <h2>New Vulnerability Scan</h2>
-        <form id="scanForm">
-          <input
-            type="text"
-            id="target"
-            placeholder="Target (IP or Domain)"
-            required
-          />
-          <select id="mode">
-            <option value="blue">Blue Team Mode</option>
-            <option value="red">Red Team Mode</option>
-          </select>
-          <button type="submit">Start Scan</button>
-        </form>
-        <div id="scanMessage"></div>
-      </div>
-      <div class="results" id="results"></div>
+    </nav>
+
+    <div class="scan-form flex flex-col justify-center items-center">
+      <form
+        class="flex flex-col w-1/3 backdrop-blur-[2px] bg-neutral-300/20 border border-[#ebebeb] rounded-lg p-5"
+        id="scanForm"
+      >
+        <h2 class="text-2xl font-semibold mb-5">New Vulnerability Scan</h2>
+        <input
+          type="text"
+          id="target"
+          class="border bg-white border-neutral-400 px-3 py-1.5 rounded-md w-full"
+          placeholder="Target (IP or Domain)"
+          required
+        />
+        <select
+          class="mt-5 border bg-white border-neutral-400 px-3 py-2 rounded-md w-full"
+          id="mode"
+        >
+          <option value="blue">Blue Team Mode</option>
+          <option value="red">Red Team Mode</option>
+        </select>
+        <button
+          class="mt-10 rounded-xl cursor-pointer bg-purp px-8 py-3 text-white"
+          type="submit"
+        >
+          Start Scan
+        </button>
+      </form>
+      <div id="scanMessage" class="mt-10 w-1/3 bg-green-300"></div>
+      <div class="results w-1/3 mt-10 bg-red-500" id="results"></div>
     </div>
+
+    <!-- Results -->
+
     <script>
+      // Flask server URL - change this if your Flask server runs on a different port
+      const API_BASE_URL = "http://127.0.0.1:5000";
+
       document
         .getElementById("scanForm")
         .addEventListener("submit", async function (e) {
@@ -107,12 +85,25 @@
           resultsDiv.innerHTML = "";
 
           try {
-            const response = await fetch("/dashboard/targets", {
+            const response = await fetch(`${API_BASE_URL}/dashboard/targets`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
+              credentials: "include",
               body: JSON.stringify({ target, mode }),
             });
+
+            if (!response.ok) {
+              const errorText = await response.text();
+              console.error("Response error:", response.status, errorText);
+              messageDiv.textContent = `Error ${response.status}: ${
+                errorText || response.statusText
+              }`;
+              return;
+            }
+
             const data = await response.json();
+            console.log("Scan response:", data);
+
             if (data.status === "true") {
               messageDiv.textContent = "Scan completed successfully!";
               resultsDiv.innerHTML = `<h3>Scan Results</h3>
@@ -135,10 +126,10 @@
               messageDiv.textContent = "Error: " + data.message;
             }
           } catch (error) {
-            messageDiv.textContent = "Error: " + error.message;
+            console.error("Scan error:", error);
+            messageDiv.textContent = `Network error: ${error.message}. Make sure the Flask server is running.`;
           }
         });
     </script>
   </body>
 </html>
-

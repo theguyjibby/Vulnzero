@@ -25,6 +25,9 @@ CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
 app.config['SECRET_KEY'] = 'your_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///vulnZero.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SECURE'] = False  # Set to True in production with HTTPS
 
 # MongoDB connection for storing analyzed scan results
 mongo_client = MongoClient('mongodb://localhost:27017/')
@@ -456,7 +459,7 @@ def get_analyzed_scans_from_mongodb(user_id, target_id=None, limit=50):
 @app.route('/dashboard/analyzed-scans', methods=['GET'])
 @login_required
 def get_analyzed_scans():
-    """Get analyzed scan results from MongoDB for current user only"""
+    """Get analyzed scan results from MongoDB for current user only with time, target, and mode details"""
     if not current_user or not hasattr(current_user, 'id'):
         return jsonify({'error': 'User not authenticated'}), 401
     
@@ -464,32 +467,63 @@ def get_analyzed_scans():
     limit = request.args.get('limit', 50, type=int)
     
     scans = get_analyzed_scans_from_mongodb(user_id=current_user.id, target_id=target_id, limit=limit)
-    return jsonify({'scans': scans}), 200
+    
+    # Format scans with key details: time, target, mode
+    result = []
+    for scan in scans:
+        scan_entry = {
+            'scan_id': str(scan.get('_id', '')),
+            'scan_timestamp': scan.get('scan_timestamp'),
+            'target_name': scan.get('target_name', 'Unknown'),
+            'target_ip': scan.get('target_ip', 'Unknown'),
+            'target_id': scan.get('target_id'),
+            'mode': scan.get('mode', 'unknown'),
+            'status': scan.get('status', 'unknown'),
+            'total_vulnerabilities': scan.get('total_vulnerabilities', 0),
+            'zap_alerts_count': scan.get('zap_alerts_count', 0),
+            'comprehensive_vulns_count': scan.get('comprehensive_vulns_count', 0)
+        }
+        result.append(scan_entry)
+    
+    # Sort by most recent scan timestamp (newest first)
+    result.sort(key=lambda x: x.get('scan_timestamp', ''), reverse=True)
+    
+    return jsonify({
+        'scans': result,
+        'total_scans': len(result)
+    }), 200
 
 @app.route('/dashboard/analyzed-scans/<scan_id>', methods=['GET'])
 @login_required
 def get_analyzed_scan_details(scan_id):
-    """Get specific analyzed scan result by MongoDB _id (user's scans only)"""
+    """Get AI analysis for a specific scan by MongoDB _id (user's scans only)"""
     if not current_user or not hasattr(current_user, 'id'):
         return jsonify({'error': 'User not authenticated'}), 401
     
     try:
         from bson import ObjectId
-        scan = scans_collection.find_one({
-            '_id': ObjectId(scan_id),
-            'user_id': current_user.id  # Ensure user can only access their own scans
-        })
+        scan = scans_collection.find_one(
+            {
+                '_id': ObjectId(scan_id),
+                'user_id': current_user.id  # Ensure user can only access their own scans
+            },
+            {'ai_analysis': 1}  # Only fetch the ai_analysis field
+        )
         
         if not scan:
             return jsonify({'error': 'Scan not found or access denied'}), 404
         
-        # Convert ObjectId and datetime for JSON serialization
-        scan['_id'] = str(scan['_id'])
-        scan['scan_timestamp'] = scan['scan_timestamp'].isoformat()
+        # Return only the AI analysis
+        ai_analysis = scan.get('ai_analysis', {})
         
-        return jsonify(scan), 200
+        if not ai_analysis:
+            return jsonify({'error': 'AI analysis not available for this scan'}), 404
+        
+        return jsonify(ai_analysis), 200
+    except ValueError as e:
+        return jsonify({'error': f'Invalid scan ID format: {str(e)}'}), 400
     except Exception as e:
-        return jsonify({'error': f'Invalid scan ID: {str(e)}'}), 400
+        return jsonify({'error': f'Error retrieving scan: {str(e)}'}), 500
 
 
 
@@ -499,4 +533,3 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     app.run(debug=True)
-

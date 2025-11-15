@@ -185,7 +185,7 @@ def input_target():
      #   return jsonify({'status': 'false', 'message': 'User not authenticated!'}), 401
     
     try:
-        data = request.get_json(force=True)
+        data = request.get_json()
     except Exception as e:
         return jsonify({'status': 'false', 'message': f'Invalid JSON: {str(e)}'}), 400
     

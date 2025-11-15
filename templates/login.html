@@ -55,12 +55,12 @@
         <p>
           Don't have an account?<a
             class="text-sm text-purp"
-            href="/templates/register.html"
+            href="{{url_for('register')}}"
           >
             Register here</a
           >
         </p>
-        <!-- <p><a class="text-sm text-purp" href="/templates/home.html">Back to Home</a></p> -->
+        <!-- <p><a class="text-sm text-purp" href="{{url_for('home')}}">Back to Home</a></p> -->
       </div>
     </section>
     <script>
@@ -100,7 +100,7 @@
               messageDiv.className = "message success";
               messageDiv.textContent = data.message;
               setTimeout(
-                () => (window.location.href = `/templates/dashboard.html`),
+                () => (window.location.href = `{{url_for('dashboard')}}`),
                 1000
               );
             } else {

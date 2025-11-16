@@ -1,21 +1,21 @@
-
-
 import os
 import json
-import re
-import xml.etree.ElementTree as ET
-from typing import Any, Dict, Optional
-from openai import OpenAI
+from typing import Any, Dict
 from dotenv import load_dotenv
+
+import google.genai as genai
+from google.genai import types 
+# The type import is still useful, but we won't use the JSON-specific config options
 
 load_dotenv()
 
-
+# IMPORTANT: Ensure GEMINI_API_KEY is correctly set in your environment or .env file.
 def analyze_json_ai_only(
     scan_json: Dict[str, Any],
     mode: str,
-    api_key= os.getenv("API_KEY"),
-    model: str = "gpt-5",
+    # Use the specific Gemini environment variable for clarity
+    api_key=os.getenv("GEMINI_API_KEY"), 
+    model: str = "gemini-2.5-flash",
     temperature: float = 0.15,
     max_tokens: int = 2000
 ) -> Dict[str, Any]:
@@ -27,26 +27,31 @@ def analyze_json_ai_only(
     except Exception as e:
         return {"status": "error", "error": f"Failed to serialize JSON: {e}"}
 
+    # --- INSTRUCTION PROMPT (MODIFIED to request structured text) ---
     instruction = (
-        "You are an expert web/security analyst. Analyze the provided XML vulnerability scan report and "
-        "return STRICT valid JSON (no extra commentary) matching the schema described below.\n\n"
+        "You are an expert web/security analyst. Analyze the provided json vulnerability scan report and "
+        "return a **structured text report**. Use clear headings and lists to organize the information "
+        "according to the schema structure described below. DO NOT return raw JSON.\n\n" # <--- MODIFIED
         "TOP-LEVEL OBJECT SCHEMA:\n"
         "{\n"
-        "  \"top_level_summary\": \"<2-3 sentence overview>\",\n"
-        "  \"overall_risk_score\": <integer 1-10>,\n"
-        "  \"risk_table\": {\"Critical\": int, \"High\": int, \"Medium\": int, \"Low\": int},\n"
-        "  \"top_findings_table\": [ { index, name, severity, risk_score, url (opt), description, rationale, remediation OR exploitation_concept & detection_indicators } ... up to 5 ],\n"
-        "  \"ranked_findings\": [ same structure as top_findings_table for full list sorted by risk_score desc ],\n"
-        "  \"reconnaissance\": {\n"
-        "      \"open_ports\": [ {\"port\": int, \"protocol\": \"tcp|udp\", \"service\": \"\", \"version\": \"\"}, ... ],\n"
-        "      \"services\": [ {\"service\": \"\", \"port\": int}, ... ],\n"
-        "      \"service_versions\": [ {\"service\":\"\", \"version\":\"\", \"port\": int}, ... ],\n"
-        "      \"subdomains\": [\"a.example.com\", ...],\n"
-        "      \"subdirectories\": [\"/admin\", \"/uploads\", ...],\n"
-        "      \"ip_addresses\": [\"1.2.3.4\", ...],\n"
-        "      \"hostnames\": [\"host.example.com\", ...]\n"
-        "  },\n"
-        "  \"truncated\": <boolean>\n"
+        "  \"top_level_summary\": \"<2-3 sentence overview>\",\n"
+        "TOP-LEVEL OBJECT SCHEMA:\n"
+        "{\n"
+        "  \"top_level_summary\": \"<2-3 sentence overview>\",\n"
+        "  \"overall_risk_score\": <integer 1-10>,\n"
+        "  \"risk_table\": {\"Critical\": int, \"High\": int, \"Medium\": int, \"Low\": int},\n"
+        "  \"top_findings_table\": [ { index, name, severity, risk_score, url (opt), description, rationale, remediation OR exploitation_concept & detection_indicators } ... up to 5 ],\n"
+        "  \"ranked_findings\": [ same structure as top_findings_table for full list sorted by risk_score desc ],\n"
+        "  \"reconnaissance\": {\n"
+        "      \"open_ports\": [ {\"port\": int, \"protocol\": \"tcp|udp\", \"service\": \"\", \"version\": \"\"}, ... ],\n"
+        "      \"services\": [ {\"service\": \"\", \"port\": int}, ... ],\n"
+        "      \"service_versions\": [ {\"service\":\"\", \"version\":\"\", \"port\": int}, ... ],\n"
+        "      \"subdomains\": [\"a.example.com\", ...],\n"
+        "      \"subdirectories\": [\"/admin\", \"/uploads\", ...],\n"
+        "      \"ip_addresses\": [\"1.2.3.4\", ...],\n"
+        "      \"hostnames\": [\"host.example.com\", ...]\n"
+        "  },\n"
+        "  \"truncated\": <boolean>\n"
         "}\n\n"
         f"MODE: {mode.upper()}\n"
         + (
@@ -56,63 +61,63 @@ def analyze_json_ai_only(
             "If MODE=RED: include 'exploitation_concept' (high-level conceptual attack path) and 'detection_indicators' (log/monitoring cues). DO NOT provide exploit payloads, step-by-step commands, or scripts.\n"
         )
         + "\nSAFETY RULE: Under no circumstances return exploit payloads, working exploit code, step-by-step commands, or automation scripts that enable unauthorized access. For RED mode, only conceptual attack vectors and detection cues are allowed.\n"
-        "Return ONLY the JSON object and no other text."
+        "Return ONLY the structured text report and no other commentary." # <--- MODIFIED
     )
     prompt = f"{instruction}\n\nSCAN_JSON:\n{scan_json_str}"
 
     key = api_key
     if not key:
-        return {"status": "error", "error": "No API key provided (api_key param or OPENAI_API_KEY env var required)."}
+        return {"status": "error", "error": "No API key provided. Please set the 'GEMINI_API_KEY' environment variable."}
 
-    client = OpenAI(api_key=key)
+    # Define the system instruction text (Still good for setting the model's persona)
+    system_instruction_text = "You are a concise security analyst that outputs a structured text report."
+
     try:
-        resp = client.chat.completions.create(
-            model=model,
-            messages=[
-                {"role": "system", "content": "You are a concise security analyst that outputs strictly valid JSON."},
-                {"role": "user", "content": prompt}
-            ],
+        client = genai.Client(api_key=key) 
+    except Exception as e:
+        return {"status": "error", "error": f"Failed to initialize Gemini client: {e}"}
+    
+    try:
+        # 1. Define the generation config:
+        # We REMOVE response_mime_type="application/json" to get standard text output
+        generation_config = types.GenerateContentConfig( 
             temperature=temperature,
-            max_tokens=max_tokens
+            max_output_tokens=max_tokens,
+            # response_mime_type="application/json", # <-- REMOVED
+            system_instruction=system_instruction_text 
         )
+
+        # 2. Make the call
+        resp = client.models.generate_content(
+            model=model,
+            contents=prompt,
+            config=generation_config
+        )
+        
+        # Check for a blocked or empty response
+        if not resp.text:
+             return {"status": "error", "error": f"API returned an empty response. Check if content was blocked or if the prompt is too complex for the model. Raw response object: {str(resp)}"}
+
+
     except Exception as e:
         return {"status": "error", "error": f"API request failed: {e}"}
 
-    try:
-        assistant_text = resp.choices[0].message.content
-    except Exception:
-        assistant_text = str(resp)
+    # --- Output handling is now simple text access ---
+    assistant_text = resp.text
 
-    try:
-        parsed = json.loads(assistant_text)
-    except Exception:
-        m = re.search(r"(\{[\s\S]*\})", assistant_text)
-        parsed = json.loads(m.group(1)) if m else None
-
-    if parsed is not None:
-        parsed.setdefault("risk_table", {"Critical": 0, "High": 0, "Medium": 0, "Low": 0})
-        parsed.setdefault("reconnaissance", {
-            "open_ports": [], "services": [], "service_versions": [],
-            "subdomains": [], "subdirectories": [], "ip_addresses": [], "hostnames": []
-        })
-        parsed.setdefault("ranked_findings", [])
-        parsed.setdefault("top_findings_table", parsed["ranked_findings"][:5])
-        parsed.setdefault("truncated", False)
-        try:
-            ors = int(parsed.get("overall_risk_score") or 1)
-            parsed["overall_risk_score"] = max(1, min(10, ors))
-        except Exception:
-            parsed["overall_risk_score"] = 1
-        return {"status": "ok", "parsed": parsed, "raw": assistant_text}
-    else:
-        return {"status": "warning", "parsed": None, "raw": assistant_text,
-                "error": "Assistant output not parseable as JSON. Inspect 'raw' for debugging."}
-    
+    # Since you want raw text, we return it directly, skipping the complex JSON parsing/cleaning
+    return {"status": "ok", "raw_report": assistant_text}
 
 if __name__ == "__main__":
-    yay = analyze_json_ai_only({"Ip": "1.2.3.4", "Port": 80, "Protocol": "tcp"},"red")
-    print(yay)
-    #api_key = os.getenv("API_KEY")
-    #print(f"API_KEY:{api_key} ")
-
-    
+    # Example minimal input data
+    yay = analyze_json_ai_only(
+        {
+            "target": "example.com", 
+            "vulnerabilities": [
+                {"name": "XSS", "severity": "High", "url": "/search"},
+                {"name": "Outdated SSH", "severity": "Medium", "port": 22}
+            ]
+        },
+        "red"
+    )
+    print(json.dumps(yay, indent=2))

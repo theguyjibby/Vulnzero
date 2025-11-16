@@ -14,7 +14,7 @@ import re, socket
 from subdomain import find_subdomains_and_crawl
 from subdirectory import get_subdirectories
 from ssl_cert import get_ssl_certificate_info
-from Zap_vuln_scan import ZapScanner
+from Nikto_vuln_scan import run_nikto_scan
 from comprehensive_scanner import run_comprehensive_scan
 from prompt_normalizer import normalize_zap_and_recon_to_json, write_json, build_recon_from_models
 from AI_analyzer import analyze_json_ai_only
@@ -219,6 +219,15 @@ def input_target():
             ipaddress = socket.gethostbyname(hostname)
         except socket.gaierror:
             return jsonify({'status': 'false', 'message': 'Unable to resolve hostname!'}), 400
+        
+    elif re.search(r'^https?://', target):
+        target_url = target
+
+        try:
+            hostname = re.sub(r'^https?://', '', target).split('/')[0]
+            ipaddress = socket.gethostbyname(hostname)
+        except socket.gaierror:
+            return jsonify({'status': 'false', 'message': 'Unable to resolve hostname from URL!'}), 400
 
     else: 
         return jsonify({'status': 'false', 'message': 'Invalid target format!'}), 400
@@ -262,25 +271,25 @@ def input_target():
         subdirectories = []
 
     # Automated vulnerability scanning and normalization (JSON)
-    # Build a basic URL guess for ZAP: prefer https if port 443 is open
-    ports = {p['port'] for p in open_ports}
-    scheme = 'https' if 443 in ports else 'http'
+    # Build a basic URL guess for Nikto: prefer https if port 443 is open
+    
+    scheme = 'http'
     target_url = f"{scheme}://{ipaddress}"
 
     # Threading variables to store results
-    zap_alerts = []
+    nikto_alerts = []
     comprehensive_results = None
-    zap_error = None
+    nikto_error = None
     comp_error = None
 
-    def run_zap_scan():
-        nonlocal zap_alerts, zap_error
+    def run_nikto_scan_wrapper():
+        nonlocal nikto_alerts, nikto_error
         try:
-            zap_scanner = ZapScanner()
-            zap_alerts = zap_scanner.scan(target_url)
+            
+            nikto_alerts = run_nikto_scan(target_url)
         except Exception as e:
-            zap_error = str(e)
-            zap_alerts = []
+            nikto_error = str(e)
+            nikto_alerts = []
 
     def run_comprehensive_scan_thread():
         nonlocal comprehensive_results, comp_error
@@ -291,14 +300,14 @@ def input_target():
             comprehensive_results = None
 
     # Start both scanners in parallel
-    zap_thread = threading.Thread(target=run_zap_scan)
+    nikto_thread = threading.Thread(target=run_nikto_scan_wrapper)
     comp_thread = threading.Thread(target=run_comprehensive_scan_thread)
     
-    zap_thread.start()
+    nikto_thread.start()
     comp_thread.start()
     
     # Wait for both to complete
-    zap_thread.join()
+    nikto_thread.join()
     comp_thread.join()
 
     # Collect reconnaissance data from DB to embed
@@ -311,10 +320,10 @@ def input_target():
         ipaddress=ipaddress,
     )
 
-    # Merge ZAP and comprehensive scanner results
-    all_vulnerabilities = list(zap_alerts) if zap_alerts else []
+    # Merge Nikto and comprehensive scanner results
+    all_vulnerabilities = list(nikto_alerts) if nikto_alerts else []
     if comprehensive_results and 'vulnerabilities' in comprehensive_results:
-        # Convert comprehensive scanner results to ZAP-like format
+        # Convert comprehensive scanner results to Nikto-like format
         for vuln in comprehensive_results['vulnerabilities']:
             all_vulnerabilities.append({
                 'source': 'comprehensive_scanner',
@@ -342,12 +351,13 @@ def input_target():
         'ip': ipaddress,
         'subdomains_found': len(subdomains),
         'subdirectories_found': len(subdirectories),
-        'zap_alerts_count': len(zap_alerts),
+        'nikto_alerts_count': len(nikto_alerts),
         'comprehensive_vulns_count': len(comprehensive_results.get('vulnerabilities', [])) if comprehensive_results else 0,
         'total_vulnerabilities': len(all_vulnerabilities),
-        'zap_error': zap_error,
+        'nikto_error': nikto_error,
         'comprehensive_error': comp_error,
-        'normalized_json_path': json_out_path
+        'normalized_json_path': json_out_path,
+        'normalized_combined_vuln': normalized
     }
 
     if analyze_flag:
@@ -366,11 +376,11 @@ def input_target():
             normalized_data=normalized,
             ai_analysis=analysis,
             mode=mode,
-            zap_alerts_count=len(zap_alerts),
+            nikto_alerts_count=len(nikto_alerts),
             comprehensive_vulns_count=len(comprehensive_results.get('vulnerabilities', [])) if comprehensive_results else 0,
             total_vulnerabilities=len(all_vulnerabilities),
             user_id=current_user.id,
-            zap_error=zap_error,
+            nikto_error=nikto_error,
             comprehensive_error=comp_error
         )
 
@@ -411,8 +421,8 @@ def save_ssl_certificate_to_db(target_id, cert_info):
     db.session.commit()
 
 def save_analyzed_scan_to_mongodb(target_id, target_name, target_ip, normalized_data, ai_analysis, mode, 
-                                 zap_alerts_count, comprehensive_vulns_count, total_vulnerabilities, 
-                                 user_id, zap_error=None, comprehensive_error=None):
+                                 nikto_alerts_count, comprehensive_vulns_count, total_vulnerabilities, 
+                                 user_id, nikto_error=None, comprehensive_error=None):
     """
     Save analyzed scan results to MongoDB with user isolation
     """
@@ -423,12 +433,12 @@ def save_analyzed_scan_to_mongodb(target_id, target_name, target_ip, normalized_
         'target_ip': target_ip,
         'scan_timestamp': datetime.utcnow(),
         'mode': mode,
-        'zap_alerts_count': zap_alerts_count,
+        'nikto_alerts_count': nikto_alerts_count,
         'comprehensive_vulns_count': comprehensive_vulns_count,
         'total_vulnerabilities': total_vulnerabilities,
         'normalized_data': normalized_data,
         'ai_analysis': ai_analysis,
-        'zap_error': zap_error,
+        'nikto_error': nikto_error,
         'comprehensive_error': comprehensive_error,
         'status': 'completed'
     }
@@ -480,7 +490,7 @@ def get_analyzed_scans():
             'mode': scan.get('mode', 'unknown'),
             'status': scan.get('status', 'unknown'),
             'total_vulnerabilities': scan.get('total_vulnerabilities', 0),
-            'zap_alerts_count': scan.get('zap_alerts_count', 0),
+            'nikto_alerts_count': scan.get('nikto_alerts_count', 0),
             'comprehensive_vulns_count': scan.get('comprehensive_vulns_count', 0)
         }
         result.append(scan_entry)

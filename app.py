@@ -219,6 +219,15 @@ def input_target():
             ipaddress = socket.gethostbyname(hostname)
         except socket.gaierror:
             return jsonify({'status': 'false', 'message': 'Unable to resolve hostname!'}), 400
+        
+    elif re.search(r'^https?://', target):
+        target_url = target
+
+        try:
+            hostname = re.sub(r'^https?://', '', target).split('/')[0]
+            ipaddress = socket.gethostbyname(hostname)
+        except socket.gaierror:
+            return jsonify({'status': 'false', 'message': 'Unable to resolve hostname from URL!'}), 400
 
     else: 
         return jsonify({'status': 'false', 'message': 'Invalid target format!'}), 400

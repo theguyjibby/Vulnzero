@@ -16,8 +16,9 @@ def scan_target(ip, port_range):
             })
     return open_ports
 
-if "__name__" == "__main__":
+if __name__ == "__main__":
     ip = "192.168.206.129"
     port_range = "1-1024"
     open_ports = scan_target(ip, port_range)
     print(open_ports)
+

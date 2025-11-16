@@ -35,9 +35,23 @@ def analyze_json_ai_only(
         "TOP-LEVEL OBJECT SCHEMA:\n"
         "{\n"
         "  \"top_level_summary\": \"<2-3 sentence overview>\",\n"
-        # ... (rest of the schema definition omitted for brevity) ...
-        # NOTE: Even though you don't want JSON, keeping the schema in the prompt 
-        # helps the model generate structured output that follows those fields.
+        "TOP-LEVEL OBJECT SCHEMA:\n"
+        "{\n"
+        "  \"top_level_summary\": \"<2-3 sentence overview>\",\n"
+        "  \"overall_risk_score\": <integer 1-10>,\n"
+        "  \"risk_table\": {\"Critical\": int, \"High\": int, \"Medium\": int, \"Low\": int},\n"
+        "  \"top_findings_table\": [ { index, name, severity, risk_score, url (opt), description, rationale, remediation OR exploitation_concept & detection_indicators } ... up to 5 ],\n"
+        "  \"ranked_findings\": [ same structure as top_findings_table for full list sorted by risk_score desc ],\n"
+        "  \"reconnaissance\": {\n"
+        "      \"open_ports\": [ {\"port\": int, \"protocol\": \"tcp|udp\", \"service\": \"\", \"version\": \"\"}, ... ],\n"
+        "      \"services\": [ {\"service\": \"\", \"port\": int}, ... ],\n"
+        "      \"service_versions\": [ {\"service\":\"\", \"version\":\"\", \"port\": int}, ... ],\n"
+        "      \"subdomains\": [\"a.example.com\", ...],\n"
+        "      \"subdirectories\": [\"/admin\", \"/uploads\", ...],\n"
+        "      \"ip_addresses\": [\"1.2.3.4\", ...],\n"
+        "      \"hostnames\": [\"host.example.com\", ...]\n"
+        "  },\n"
+        "  \"truncated\": <boolean>\n"
         "}\n\n"
         f"MODE: {mode.upper()}\n"
         + (

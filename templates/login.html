@@ -53,11 +53,8 @@
           </button>
         </form>
         <p>
-          Don't have an account?<a
-            class="text-sm text-purp"
-            href="{{url_for('register')}}"
-          >
-            Register here</a
+          Don't have an account? <button class="text-sm text-purp" onclick="window.location.href='/templates/register.html'">
+            Register</button
           >
         </p>
         <!-- <p><a class="text-sm text-purp" href="{{url_for('home')}}">Back to Home</a></p> -->
@@ -100,7 +97,7 @@
               messageDiv.className = "message success";
               messageDiv.textContent = data.message;
               setTimeout(
-                () => (window.location.href = `{{url_for('dashboard')}}`),
+                () => (window.location.href = '/templates/dashboard.html'),
                 1000
               );
             } else {

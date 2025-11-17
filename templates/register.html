@@ -62,8 +62,8 @@
         </form>
         <p class="color-text">
           Already have an account?
-          <a class="text-sm text-purp" href="{{url_for('login')}}">
-            Login here</a
+          <button class="text-sm text-purp" onclick="window.location.href='/templates/login.html'">
+            Login here</button
           >
         </p>
       </div>
@@ -109,7 +109,7 @@
               messageDiv.className = "message success";
               messageDiv.textContent = data.message;
               setTimeout(
-                () => (window.location.href = `{{url_for('login')}}`),
+                () =>  (window.location.href = '/templates/login.html'),
                 2000
               );
             } else {

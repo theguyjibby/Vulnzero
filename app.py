@@ -274,7 +274,7 @@ def input_target():
     # Build a basic URL guess for Nikto: prefer https if port 443 is open
     
     scheme = 'http'
-    target_url = f"{scheme}://{ipaddress}"
+    target_url_basic = f"{scheme}://{ipaddress}"
 
     # Threading variables to store results
     nikto_alerts = []
@@ -285,8 +285,10 @@ def input_target():
     def run_nikto_scan_wrapper():
         nonlocal nikto_alerts, nikto_error
         try:
-            
-            nikto_alerts = run_nikto_scan(target_url)
+            if target_url:
+                nikto_alerts = run_nikto_scan(target_url)
+            else:
+                nikto_alerts = run_nikto_scan(target_url_basic)
         except Exception as e:
             nikto_error = str(e)
             nikto_alerts = []
@@ -294,7 +296,10 @@ def input_target():
     def run_comprehensive_scan_thread():
         nonlocal comprehensive_results, comp_error
         try:
-            comprehensive_results = run_comprehensive_scan(target_url)
+            if target_url:
+                comprehensive_results = run_comprehensive_scan(target_url)
+            else:
+                comprehensive_results = run_comprehensive_scan(target_url_basic)
         except Exception as e:
             comp_error = str(e)
             comprehensive_results = None
@@ -303,11 +308,11 @@ def input_target():
     nikto_thread = threading.Thread(target=run_nikto_scan_wrapper)
     comp_thread = threading.Thread(target=run_comprehensive_scan_thread)
     
-    nikto_thread.start()
+    #nikto_thread.start()
     comp_thread.start()
     
     # Wait for both to complete
-    nikto_thread.join()
+    #nikto_thread.join()
     comp_thread.join()
 
     # Collect reconnaissance data from DB to embed

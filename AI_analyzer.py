@@ -29,26 +29,45 @@ def analyze_json_ai_only(
 
     # --- INSTRUCTION PROMPT (MODIFIED to request structured text) ---
     instruction = (
-        "You are an expert web/security analyst. Analyze the provided json vulnerability scan report and "
-        "return a **structured text report**. Use clear headings and lists to organize the information "
-        "according to the schema structure described below. DO NOT return raw JSON.\n\n" # <--- MODIFIED
-        "TOP-LEVEL OBJECT SCHEMA:\n"
-        "{\n"
-        "  \"top_level_summary\": \"<2-3 sentence overview>\",\n"
-        # ... (rest of the schema definition omitted for brevity) ...
-        # NOTE: Even though you don't want JSON, keeping the schema in the prompt 
-        # helps the model generate structured output that follows those fields.
-        "}\n\n"
-        f"MODE: {mode.upper()}\n"
-        + (
-            "If MODE=BLUE: include 'remediation' for each finding (concrete fixes, config, mitigations).\n"
-            if mode == "blue"
-            else
-            "If MODE=RED: include 'exploitation_concept' (high-level conceptual attack path) and 'detection_indicators' (log/monitoring cues). DO NOT provide exploit payloads, step-by-step commands, or scripts.\n"
-        )
-        + "\nSAFETY RULE: Under no circumstances return exploit payloads, working exploit code, step-by-step commands, or automation scripts that enable unauthorized access. For RED mode, only conceptual attack vectors and detection cues are allowed.\n"
-        "Return ONLY the structured text report and no other commentary." # <--- MODIFIED
+    "You are an expert web/security analyst. Analyze the provided json vulnerability scan report and "
+    "return a single **structured text report** using **STRICT MARKDOWN** formatting. "
+    "DO NOT return raw JSON or any commentary outside the report structure. "
+    "Follow the EXACT STRUCTURE, HEADINGS (use # and ##), and FIELD NAMES below.\n\n"
+    
+    "## 📄 Top-Level Summary\n"
+    "* **Top-Level Summary:** <2-3 sentence overview>\n"
+    "* **Overall Risk Score:** <integer 1-10>\n"
+    
+    "## 📈 Risk Table\n"
+    "**REQUIRED ACTION: Generate a MARKDOWN TABLE.** Columns MUST be **Severity** and **Count** (Critical, High, Medium, Low).\n"
+    
+    "## 🛑 Top Findings Table\n"
+    "**REQUIRED ACTION: Generate a MARKDOWN TABLE.** List the top 5 findings. Columns MUST include: **Index**, **Name**, **Severity**, **Risk Score**, **Description**, and the required **MODE-specific column(s)** below.\n"
+    
+    "## 🔍 Reconnaissance\n"
+    "**REQUIRED ACTION: Generate MARKDOWN LISTS.** Provide a separate list for each category, listing all available data:\n"
+    "* **Open Ports**\n"
+    "* **Services**\n"
+    "* **Service Versions**\n"
+    "* **Subdomains**\n"
+    "* **Subdirectories**\n"
+    "* **IP Addresses**\n"
+    "* **Hostnames**\n"
+    
+    "## 📏 Truncated\n"
+    "* **Truncated:** <boolean>\n\n"
+    
+    f"MODE: {mode.upper()}\n"
+    + (
+        "If MODE=BLUE: **CRITICALLY IMPORTANT**: Top Findings Table MUST include a **Remediation** column.\n"
+        if mode == "blue"
+        else
+        "If MODE=RED: **CRITICALLY IMPORTANT**: Top Findings Table MUST include **Exploitation Concept** and **Detection Indicators** columns. DO NOT provide exploit payloads, step-by-step commands, or scripts.\n"
     )
+    + "\nSAFETY RULE: Under no circumstances return exploit payloads, working exploit code, step-by-step commands, or automation scripts that enable unauthorized access.\n"
+    "Return ONLY the structured text report and no other text."
+
+)
     prompt = f"{instruction}\n\nSCAN_JSON:\n{scan_json_str}"
 
     key = api_key

@@ -68,7 +68,9 @@
 
     <!-- Results -->
 
-    <script>
+    <script type="module">
+      import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
+
       // Flask server URL - change this if your Flask server runs on a different port
       const API_BASE_URL = "http://127.0.0.1:5000";
 
@@ -106,7 +108,7 @@
 
             if (data.status === "true") {
               messageDiv.textContent = "Scan completed successfully!";
-              resultsDiv.innerHTML = `<h3>Scan Results</h3>
+              resultsDiv.innerHTML = marked.parse(`<h3>Scan Results</h3>
                         <p><strong>Target:</strong> ${data.target}</p>
                         <p><strong>IP:</strong> ${data.ip}</p>
                         <p><strong>Subdomains Found:</strong> ${
@@ -115,13 +117,10 @@
                         <p><strong>Subdirectories Found:</strong> ${
                           data.subdirectories_found
                         }</p>
-                        <p><strong>ZAP Alerts:</strong> ${
-                          data.zap_alerts_count
-                        }</p>
                         <p><strong>Total Vulnerabilities:</strong> ${
                           data.total_vulnerabilities
                         }</p>
-                        <pre>${JSON.stringify(data, null, 2)}</pre>`;
+                        <pre>${JSON.stringify(data, null, 2)}</pre>`);
             } else {
               messageDiv.textContent = "Error: " + data.message;
             }

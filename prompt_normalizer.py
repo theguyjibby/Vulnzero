@@ -6,21 +6,21 @@ from typing import Any, Dict, List, Optional
 
 
 # -------------------------
-# JSON Normalization (ZAP + Recon)
+# JSON Normalization (Scanner + Recon)
 # -------------------------
 
 def normalize_zap_and_recon_to_json(
-    zap_alerts: Optional[List[Dict[str, Any]]],
+    scanner_alerts: Optional[List[Dict[str, Any]]],
     recon: Dict[str, Any]
 ) -> Dict[str, Any]:
     """
-    Build a unified JSON structure that includes ZAP findings and reconnaissance data from DB.
+    Build a unified JSON structure that includes scanner findings (Nikto/ZAP/etc) and reconnaissance data from DB.
     recon should contain keys: open_ports, services, service_versions, subdomains, subdirectories,
     ip_addresses, hostnames, ssl_certs (optional list of cert info)
     """
     result: Dict[str, Any] = {
-        "source": "zap+recon",
-        "zap_findings": [],
+        "source": "scanner+recon",
+        "scanner_findings": [],
         "reconnaissance": {
             "open_ports": recon.get("open_ports", []),
             "services": recon.get("services", []),
@@ -33,15 +33,15 @@ def normalize_zap_and_recon_to_json(
         },
     }
 
-    for a in zap_alerts or []:
-        result["zap_findings"].append({
+    for a in scanner_alerts or []:
+        result["scanner_findings"].append({
             "name": a.get("alert") or a.get("title"),
             "severity": (a.get("risk") or a.get("severity") or "").lower(),
             "url": a.get("url"),
             "description": a.get("description"),
             "param": a.get("param"),
             "evidence": a.get("evidence"),
-            "remediation": a.get("solution"),
+            "remediation": a.get("remediation") or a.get("solution"),
         })
 
     return result
@@ -63,7 +63,7 @@ def build_recon_from_models(
 ) -> Dict[str, Any]:
     """
     Convert ORM rows (from the app's DB models) into a normalized reconnaissance dict
-    suitable for normalize_zap_and_recon_to_json.
+    suitable for normalize_zap_and_recon_to_json (works with any scanner).
     """
     open_ports = [
         {
@@ -118,5 +118,3 @@ def build_recon_from_models(
         "hostnames": [hostname],
         "ssl_certs": ssl_certs,
     }
-
-

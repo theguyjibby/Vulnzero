@@ -109,7 +109,7 @@ def test():
         'message': 'Server is working!'
     }), 200
 
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/templates/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         try:
@@ -142,7 +142,7 @@ def register():
 
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/templates/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         try:
@@ -172,7 +172,7 @@ def logout():
 
 
 
-@app.route('/dashboard', methods=['GET'])
+@app.route('/templates/dashboard', methods=['GET'])
 @login_required
 def dashboard():
     if not current_user or not hasattr(current_user, 'username'):

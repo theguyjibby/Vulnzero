@@ -12,7 +12,7 @@
       href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&family=Parkinsans:wght@300..800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./style.css" />
+    <link rel="stylesheet" href="./static/css/style.css" />
   </head>
   <style type="text/tailwindcss">
     @theme {
@@ -62,7 +62,7 @@
         </form>
         <p class="color-text">
           Already have an account?
-          <button class="text-sm text-purp" onclick="window.location.href='/templates/login.html'">
+          <button class="text-sm text-purp" onclick="window.location.href='/templates/login'">
             Login here</button
           >
         </p>
@@ -81,7 +81,7 @@
           const password = document.getElementById("password").value;
 
           try {
-            const response = await fetch(`${API_BASE_URL}/register`, {
+            const response = await fetch(`${API_BASE_URL}/templates/register`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               credentials: "include",

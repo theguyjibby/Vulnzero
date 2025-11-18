@@ -1,51 +1,6 @@
 {
-  "source": "zap+recon",
-  "zap_findings": [
-    {
-      "name": "Missing Security Header",
-      "severity": "medium",
-      "url": "",
-      "description": "X-Frame-Options header not present - Prevents clickjacking attacks",
-      "param": "",
-      "evidence": "",
-      "remediation": null
-    },
-    {
-      "name": "Missing Security Header",
-      "severity": "medium",
-      "url": "",
-      "description": "X-XSS-Protection header not present - Enables XSS filtering",
-      "param": "",
-      "evidence": "",
-      "remediation": null
-    },
-    {
-      "name": "Missing Security Header",
-      "severity": "medium",
-      "url": "",
-      "description": "X-Content-Type-Options header not present - Prevents MIME type sniffing",
-      "param": "",
-      "evidence": "",
-      "remediation": null
-    },
-    {
-      "name": "Missing Security Header",
-      "severity": "high",
-      "url": "",
-      "description": "Strict-Transport-Security header not present - Enforces HTTPS",
-      "param": "",
-      "evidence": "",
-      "remediation": null
-    },
-    {
-      "name": "Missing Security Header",
-      "severity": "high",
-      "url": "",
-      "description": "Content-Security-Policy header not present - Prevents XSS and data injection",
-      "param": "",
-      "evidence": "",
-      "remediation": null
-    },
+  "source": "scanner+recon",
+  "scanner_findings": [
     {
       "name": "Missing Security Header",
       "severity": "low",
@@ -53,16 +8,7 @@
       "description": "X-Permitted-Cross-Domain-Policies header not present - Controls cross-domain policies",
       "param": "",
       "evidence": "",
-      "remediation": null
-    },
-    {
-      "name": "Missing Security Header",
-      "severity": "low",
-      "url": "",
-      "description": "Referrer-Policy header not present - Controls referrer information",
-      "param": "",
-      "evidence": "",
-      "remediation": null
+      "remediation": "Add X-Permitted-Cross-Domain-Policies header to improve security"
     },
     {
       "name": "Missing Security Header",
@@ -71,7 +17,7 @@
       "description": "Permissions-Policy header not present - Controls browser features",
       "param": "",
       "evidence": "",
-      "remediation": null
+      "remediation": "Add Permissions-Policy header to improve security"
     },
     {
       "name": "Missing Security Header",
@@ -80,7 +26,7 @@
       "description": "Cross-Origin-Embedder-Policy header not present - Controls cross-origin embedding",
       "param": "",
       "evidence": "",
-      "remediation": null
+      "remediation": "Add Cross-Origin-Embedder-Policy header to improve security"
     },
     {
       "name": "Missing Security Header",
@@ -89,13 +35,922 @@
       "description": "Cross-Origin-Opener-Policy header not present - Controls cross-origin window access",
       "param": "",
       "evidence": "",
+      "remediation": "Add Cross-Origin-Opener-Policy header to improve security"
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/admin",
+      "description": "Redirect found at: /admin",
+      "param": "",
+      "evidence": "",
       "remediation": null
     },
     {
-      "name": "Sensitive Path Accessible",
-      "severity": "high",
-      "url": "http://192.168.206.129/test.php",
-      "description": "Dangerous path accessible: /test.php",
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/administrator",
+      "description": "Redirect found at: /administrator",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/admin.php",
+      "description": "Redirect found at: /admin.php",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/admin.html",
+      "description": "Redirect found at: /admin.html",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/admin.asp",
+      "description": "Redirect found at: /admin.asp",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/wp-admin",
+      "description": "Redirect found at: /wp-admin",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/wp-login.php",
+      "description": "Redirect found at: /wp-login.php",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/login",
+      "description": "Redirect found at: /login",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/login.php",
+      "description": "Redirect found at: /login.php",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/login.asp",
+      "description": "Redirect found at: /login.asp",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/phpmyadmin",
+      "description": "Redirect found at: /phpmyadmin",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/pma",
+      "description": "Redirect found at: /pma",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/mysql",
+      "description": "Redirect found at: /mysql",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/sql",
+      "description": "Redirect found at: /sql",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/phpmyadmin/index.php",
+      "description": "Redirect found at: /phpmyadmin/index.php",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/adminer.php",
+      "description": "Redirect found at: /adminer.php",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/adminer",
+      "description": "Redirect found at: /adminer",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/admin/",
+      "description": "Redirect found at: /admin/",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/admin/index.php",
+      "description": "Redirect found at: /admin/index.php",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/.env",
+      "description": "Redirect found at: /.env",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/config.php",
+      "description": "Redirect found at: /config.php",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/configuration.php",
+      "description": "Redirect found at: /configuration.php",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/wp-config.php",
+      "description": "Redirect found at: /wp-config.php",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/settings.php",
+      "description": "Redirect found at: /settings.php",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/config.json",
+      "description": "Redirect found at: /config.json",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/config.xml",
+      "description": "Redirect found at: /config.xml",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/web.config",
+      "description": "Redirect found at: /web.config",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/app.config",
+      "description": "Redirect found at: /app.config",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/database.yml",
+      "description": "Redirect found at: /database.yml",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/database.yaml",
+      "description": "Redirect found at: /database.yaml",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/config.yaml",
+      "description": "Redirect found at: /config.yaml",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/config.yml",
+      "description": "Redirect found at: /config.yml",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/backup",
+      "description": "Redirect found at: /backup",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/backups",
+      "description": "Redirect found at: /backups",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/backup.sql",
+      "description": "Redirect found at: /backup.sql",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/database.sql",
+      "description": "Redirect found at: /database.sql",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/dump.sql",
+      "description": "Redirect found at: /dump.sql",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/backup.tar.gz",
+      "description": "Redirect found at: /backup.tar.gz",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/backup.zip",
+      "description": "Redirect found at: /backup.zip",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/backup.rar",
+      "description": "Redirect found at: /backup.rar",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/site_backup",
+      "description": "Redirect found at: /site_backup",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/db_backup",
+      "description": "Redirect found at: /db_backup",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/files_backup",
+      "description": "Redirect found at: /files_backup",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/test",
+      "description": "Redirect found at: /test",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/debug",
+      "description": "Redirect found at: /debug",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/test.php",
+      "description": "Redirect found at: /test.php",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/info.php",
+      "description": "Redirect found at: /info.php",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/test.html",
+      "description": "Redirect found at: /test.html",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/debug.html",
+      "description": "Redirect found at: /debug.html",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/status",
+      "description": "Redirect found at: /status",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/server-info",
+      "description": "Redirect found at: /server-info",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/server-status",
+      "description": "Redirect found at: /server-status",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/status.php",
+      "description": "Redirect found at: /status.php",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/info.asp",
+      "description": "Redirect found at: /info.asp",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/test.asp",
+      "description": "Redirect found at: /test.asp",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/logs",
+      "description": "Redirect found at: /logs",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/log",
+      "description": "Redirect found at: /log",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/tmp",
+      "description": "Redirect found at: /tmp",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/temp",
+      "description": "Redirect found at: /temp",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/cache",
+      "description": "Redirect found at: /cache",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/caches",
+      "description": "Redirect found at: /caches",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/uploads",
+      "description": "Redirect found at: /uploads",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/files",
+      "description": "Redirect found at: /files",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/documents",
+      "description": "Redirect found at: /documents",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/private",
+      "description": "Redirect found at: /private",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/secure",
+      "description": "Redirect found at: /secure",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/confidential",
+      "description": "Redirect found at: /confidential",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/internal",
+      "description": "Redirect found at: /internal",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/restricted",
+      "description": "Redirect found at: /restricted",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/robots.txt",
+      "description": "Redirect found at: /robots.txt",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/sitemap.xml",
+      "description": "Redirect found at: /sitemap.xml",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/crossdomain.xml",
+      "description": "Redirect found at: /crossdomain.xml",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/favicon.ico",
+      "description": "Redirect found at: /favicon.ico",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/.git",
+      "description": "Redirect found at: /.git",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/.svn",
+      "description": "Redirect found at: /.svn",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/.hg",
+      "description": "Redirect found at: /.hg",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/.bzr",
+      "description": "Redirect found at: /.bzr",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/package.json",
+      "description": "Redirect found at: /package.json",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/composer.json",
+      "description": "Redirect found at: /composer.json",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/requirements.txt",
+      "description": "Redirect found at: /requirements.txt",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/Gemfile",
+      "description": "Redirect found at: /Gemfile",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/Dockerfile",
+      "description": "Redirect found at: /Dockerfile",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/docker-compose.yml",
+      "description": "Redirect found at: /docker-compose.yml",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/.env.example",
+      "description": "Redirect found at: /.env.example",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/.env.local",
+      "description": "Redirect found at: /.env.local",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/wp-content/uploads",
+      "description": "Redirect found at: /wp-content/uploads",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/wp-content/plugins",
+      "description": "Redirect found at: /wp-content/plugins",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/wp-content/themes",
+      "description": "Redirect found at: /wp-content/themes",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/wp-includes",
+      "description": "Redirect found at: /wp-includes",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/wp-config-sample.php",
+      "description": "Redirect found at: /wp-config-sample.php",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/readme.html",
+      "description": "Redirect found at: /readme.html",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/administrator/index.php",
+      "description": "Redirect found at: /administrator/index.php",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/joomla",
+      "description": "Redirect found at: /joomla",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/app",
+      "description": "Redirect found at: /app",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/src",
+      "description": "Redirect found at: /src",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/vendor",
+      "description": "Redirect found at: /vendor",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/node_modules",
+      "description": "Redirect found at: /node_modules",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/bower_components",
+      "description": "Redirect found at: /bower_components",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/public",
+      "description": "Redirect found at: /public",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/resources",
+      "description": "Redirect found at: /resources",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/storage",
+      "description": "Redirect found at: /storage",
+      "param": "",
+      "evidence": "",
+      "remediation": null
+    },
+    {
+      "name": "Redirect Found",
+      "severity": "medium",
+      "url": "http://github.com/database/migrations",
+      "description": "Redirect found at: /database/migrations",
       "param": "",
       "evidence": "",
       "remediation": null
@@ -104,63 +959,117 @@
       "name": "Information Disclosure",
       "severity": "low",
       "url": "",
-      "description": "Server header reveals: Apache/1.3.20 (Unix)  (Red-Hat/Linux) mod_ssl/2.8.4 OpenSSL/0.9.6b",
+      "description": "Server header reveals: github.com",
+      "param": "",
+      "evidence": "",
+      "remediation": "Consider hiding or modifying server header"
+    },
+    {
+      "name": "Command Injection",
+      "severity": "critical",
+      "url": "http://github.com?cmd=%3B%20ls",
+      "description": "Command injection vulnerability detected in parameter: cmd",
+      "param": "",
+      "evidence": "path=",
+      "remediation": "Implement proper input validation and use parameterized commands"
+    },
+    {
+      "name": "Command Injection",
+      "severity": "critical",
+      "url": "http://github.com?command=%3B%20ls",
+      "description": "Command injection vulnerability detected in parameter: command",
+      "param": "",
+      "evidence": "path=",
+      "remediation": "Implement proper input validation and use parameterized commands"
+    },
+    {
+      "name": "Command Injection",
+      "severity": "critical",
+      "url": "http://github.com?exec=%3B%20ls",
+      "description": "Command injection vulnerability detected in parameter: exec",
+      "param": "",
+      "evidence": "path=",
+      "remediation": "Implement proper input validation and use parameterized commands"
+    },
+    {
+      "name": "Command Injection",
+      "severity": "critical",
+      "url": "http://github.com?system=%3B%20ls",
+      "description": "Command injection vulnerability detected in parameter: system",
+      "param": "",
+      "evidence": "path=",
+      "remediation": "Implement proper input validation and use parameterized commands"
+    },
+    {
+      "name": "Command Injection",
+      "severity": "critical",
+      "url": "http://github.com?ping=%3B%20ls",
+      "description": "Command injection vulnerability detected in parameter: ping",
+      "param": "",
+      "evidence": "path=",
+      "remediation": "Implement proper input validation and use parameterized commands"
+    },
+    {
+      "name": "Command Injection",
+      "severity": "critical",
+      "url": "http://github.com?host=%3B%20ls",
+      "description": "Command injection vulnerability detected in parameter: host",
+      "param": "",
+      "evidence": "path=",
+      "remediation": "Implement proper input validation and use parameterized commands"
+    },
+    {
+      "name": "CMS Vulnerability",
+      "severity": "medium",
+      "url": "http://github.com/wp-includes/",
+      "description": "WordPress path accessible: /wp-includes/",
       "param": "",
       "evidence": "",
       "remediation": null
     },
     {
-      "name": "Command Injection",
-      "severity": "critical",
-      "url": "http://192.168.206.129?cmd=%3B%20ls",
-      "description": "Command injection vulnerability detected in parameter: cmd",
+      "name": "Framework Vulnerability",
+      "severity": "medium",
+      "url": "http://github.com/vendor/",
+      "description": "Framework file accessible: /vendor/",
       "param": "",
-      "evidence": "Linux",
+      "evidence": "",
       "remediation": null
     },
     {
-      "name": "Command Injection",
-      "severity": "critical",
-      "url": "http://192.168.206.129?command=%3B%20ls",
-      "description": "Command injection vulnerability detected in parameter: command",
+      "name": "API Vulnerability",
+      "severity": "medium",
+      "url": "http://github.com/rest/",
+      "description": "API endpoint accessible: /rest/",
       "param": "",
-      "evidence": "Linux",
+      "evidence": "",
       "remediation": null
     },
     {
-      "name": "Command Injection",
-      "severity": "critical",
-      "url": "http://192.168.206.129?exec=%3B%20ls",
-      "description": "Command injection vulnerability detected in parameter: exec",
+      "name": "API Vulnerability",
+      "severity": "medium",
+      "url": "http://github.com/graphql",
+      "description": "API endpoint accessible: /graphql",
       "param": "",
-      "evidence": "Linux",
+      "evidence": "",
       "remediation": null
     },
     {
-      "name": "Command Injection",
-      "severity": "critical",
-      "url": "http://192.168.206.129?system=%3B%20ls",
-      "description": "Command injection vulnerability detected in parameter: system",
+      "name": "API Vulnerability",
+      "severity": "medium",
+      "url": "http://github.com/swagger-ui/",
+      "description": "API endpoint accessible: /swagger-ui/",
       "param": "",
-      "evidence": "Linux",
+      "evidence": "",
       "remediation": null
     },
     {
-      "name": "Command Injection",
-      "severity": "critical",
-      "url": "http://192.168.206.129?ping=%3B%20ls",
-      "description": "Command injection vulnerability detected in parameter: ping",
+      "name": "API Vulnerability",
+      "severity": "medium",
+      "url": "http://github.com/api-docs/",
+      "description": "API endpoint accessible: /api-docs/",
       "param": "",
-      "evidence": "Linux",
-      "remediation": null
-    },
-    {
-      "name": "Command Injection",
-      "severity": "critical",
-      "url": "http://192.168.206.129?host=%3B%20ls",
-      "description": "Command injection vulnerability detected in parameter: host",
-      "param": "",
-      "evidence": "Linux",
+      "evidence": "",
       "remediation": null
     }
   ],
@@ -169,21 +1078,11 @@
       {
         "port": 22,
         "service": "ssh",
-        "version": "2.9p2"
+        "version": ""
       },
       {
         "port": 80,
         "service": "http",
-        "version": "1.3.20"
-      },
-      {
-        "port": 111,
-        "service": "rpcbind",
-        "version": "2"
-      },
-      {
-        "port": 139,
-        "service": "netbios-ssn",
         "version": ""
       },
       {
@@ -202,45 +1101,46 @@
         "port": 80
       },
       {
-        "service": "rpcbind",
-        "port": 111
-      },
-      {
-        "service": "netbios-ssn",
-        "port": 139
-      },
-      {
         "service": "https",
         "port": 443
       }
     ],
-    "service_versions": [
-      {
-        "service": "ssh",
-        "version": "2.9p2",
-        "port": 22
-      },
-      {
-        "service": "http",
-        "version": "1.3.20",
-        "port": 80
-      },
-      {
-        "service": "rpcbind",
-        "version": "2",
-        "port": 111
-      }
+    "service_versions": [],
+    "subdomains": [
+      "partner.github.com",
+      "socialimpact.github.com",
+      "education.github.com",
+      "slack.github.com",
+      "resources.github.com",
+      "startups.github.com",
+      "cli.github.com",
+      "wellarchitected.github.com",
+      "nonprofits.github.com",
+      "copilot.github.com",
+      "docs.github.com",
+      "desktop.github.com",
+      "support.github.com",
+      "skills.github.com",
+      "lab.github.com",
+      "gameoff.github.com",
+      "www.github.com",
+      "services.github.com",
+      "securitylab.github.com",
+      "octoverse.github.com",
+      "developer.github.com",
+      "codeql.github.com",
+      "pages.github.com",
+      "archiveprogram.github.com",
+      "stars.github.com",
+      "help.github.com",
+      "shop.github.com"
     ],
-    "subdomains": [],
-    "subdirectories": [
-      "http://www.redhat.com/",
-      "http://www.apache.org/"
-    ],
+    "subdirectories": [],
     "ip_addresses": [
-      "192.168.206.129"
+      "140.82.121.3"
     ],
     "hostnames": [
-      "192.168.206.129"
+      "github.com"
     ],
     "ssl_certs": [
       {
@@ -249,7 +1149,7 @@
         "not_before": "None",
         "not_after": "None",
         "status": null,
-        "error": "Error retrieving SSL certificate for 192.168.206.129: [SSL: SSLV3_ALERT_HANDSHAKE_FAILURE] sslv3 alert handshake failure (_ssl.c:1032)"
+        "error": "Error retrieving SSL certificate for 140.82.121.3: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: IP address mismatch, certificate is not valid for '140.82.121.3'. (_ssl.c:1000)"
       }
     ]
   }

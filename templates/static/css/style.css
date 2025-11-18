@@ -10,20 +10,20 @@
 }
 
 .login-bg {
-  background: url(./images/Dimly\ Lit\ Server\ Room.jpg);
+  background: url(/static/images/Dimly\ Lit\ Server\ Room.jpg);
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
 }
 .register-bg {
-  background: url(./images//Abstract\ Server\ Room.jpg);
+  background: url(/static/images/Abstract\ Server\ Room.jpg);
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
 }
 
 .bg-main{
-  background: url(./images//quad.svg);
+  background: url(/static/images/quad.svg);
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;

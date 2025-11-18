@@ -12,7 +12,7 @@
       href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&family=Parkinsans:wght@300..800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./style.css" />
+    <link rel="stylesheet" href="/static/css/style.css" />
   </head>
   <style type="text/tailwindcss">
     @theme {
@@ -45,17 +45,32 @@
             placeholder="Password"
             required
           />
+          <div
+            id="spinner"
+            hidden
+            class="my-2 flex flex-col items-center gap-3 text-purp"
+          >
+            <div
+              class="h-8 w-8 rounded-full border-4 border-purp/30 border-t-purp animate-spin"
+            ></div>
+            <p class="text-sm font-medium">Logging In...</p>
+          </div>
           <button
             class="mt-10 rounded-xl bg-purp px-8 py-3 text-white"
             type="submit"
           >
             Login
           </button>
+          
         </form>
         <p>
-          Don't have an account? <button class="text-sm text-purp" onclick="window.location.href='/templates/register.html'">
-            Register</button
+          Don't have an account?
+          <button
+            class="text-sm text-purp"
+            onclick="window.location.href='/templates/register'"
           >
+            Register
+          </button>
         </p>
         <!-- <p><a class="text-sm text-purp" href="{{url_for('home')}}">Back to Home</a></p> -->
       </div>
@@ -71,9 +86,10 @@
           const username = document.getElementById("username").value;
           const password = document.getElementById("password").value;
           const messageDiv = document.getElementById("message");
-
+          const spinner = document.getElementById("spinner");
+          spinner.hidden = false;
           try {
-            const response = await fetch(`${API_BASE_URL}/login`, {
+            const response = await fetch(`${API_BASE_URL}/templates/login`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               credentials: "include",
@@ -83,7 +99,8 @@
             if (!response.ok) {
               const errorText = await response.text();
               console.error("Response error:", response.status, errorText);
-              messageDiv.className = "message error";
+              spinner.hidden = true;
+              messageDiv.className = "text-red-500 text-sm my-2";
               messageDiv.textContent = `Error ${response.status}: ${
                 errorText || response.statusText
               }`;
@@ -94,18 +111,21 @@
             console.log("Login response:", data);
 
             if (data.status === "true") {
-              messageDiv.className = "message success";
+              spinner.hidden = true;
+              messageDiv.className = "text-purp text-sm my-2";
               messageDiv.textContent = data.message;
               setTimeout(
-                () => (window.location.href = '/templates/dashboard.html'),
+                () => (window.location.href = "/templates/dashboard"),
                 1000
               );
             } else {
+              spinner.hidden = true;
               messageDiv.className = "message error";
               messageDiv.textContent = data.message;
             }
           } catch (error) {
             console.error("Login error:", error);
+            spinner.hidden = true;
             messageDiv.className = "message error";
             messageDiv.textContent = `Network error: ${error.message}. Make sure the Flask server is running.`;
           }

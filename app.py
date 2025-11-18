@@ -19,7 +19,7 @@ from comprehensive_scanner import run_comprehensive_scan
 from prompt_normalizer import normalize_zap_and_recon_to_json, write_json, build_recon_from_models
 from AI_analyzer import analyze_json_ai_only
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='templates/static', static_url_path='/static')
 CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
 
 app.config['SECRET_KEY'] = 'your_secret_key'
@@ -97,7 +97,6 @@ def load_user(user_id):
 @app.route('/')
 def home():
     return render_template('home.html')
-
 @app.route('/test', methods=['GET', 'POST', 'OPTIONS'])
 def test():
     """Test endpoint to verify server is working"""
@@ -109,7 +108,7 @@ def test():
         'message': 'Server is working!'
     }), 200
 
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/templates/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         try:
@@ -142,7 +141,7 @@ def register():
 
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/templates/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         try:
@@ -172,7 +171,7 @@ def logout():
 
 
 
-@app.route('/dashboard', methods=['GET'])
+@app.route('/templates/dashboard', methods=['GET'])
 @login_required
 def dashboard():
     if not current_user or not hasattr(current_user, 'username'):
@@ -204,12 +203,20 @@ def input_target():
     if not target:
         return jsonify({'status': 'false', 'message': 'Target name is required!'}), 400
 
+    # Initialize target_url to None
+    target_url = None
+
     if re.search(r'^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}+\.[0-9]{1,3}+$', target):
         ipaddress = target
         try:
             hostname = socket.gethostbyaddr(ipaddress)[0]
         except socket.herror:
             hostname = 'null'
+        # Build target_url for IP address - use hostname if available, otherwise IP
+        if hostname != 'null':
+            target_url = f"http://{hostname}"
+        else:
+            target_url = f"http://{ipaddress}"
 
 
 
@@ -219,6 +226,8 @@ def input_target():
             ipaddress = socket.gethostbyname(hostname)
         except socket.gaierror:
             return jsonify({'status': 'false', 'message': 'Unable to resolve hostname!'}), 400
+        # Build target_url for domain name
+        target_url = f"http://{hostname}"
         
     elif re.search(r'^https?://', target):
         target_url = target
@@ -271,10 +280,7 @@ def input_target():
         subdirectories = []
 
     # Automated vulnerability scanning and normalization (JSON)
-    # Build a basic URL guess for Nikto: prefer https if port 443 is open
-    
-    scheme = 'http'
-    target_url_basic = f"{scheme}://{ipaddress}"
+    # target_url is now always set from the above validation logic
 
     # Threading variables to store results
     nikto_alerts = []
@@ -285,10 +291,7 @@ def input_target():
     def run_nikto_scan_wrapper():
         nonlocal nikto_alerts, nikto_error
         try:
-            if target_url:
-                nikto_alerts = run_nikto_scan(target_url)
-            else:
-                nikto_alerts = run_nikto_scan(target_url_basic)
+            nikto_alerts = run_nikto_scan(target_url)
         except Exception as e:
             nikto_error = str(e)
             nikto_alerts = []
@@ -296,10 +299,7 @@ def input_target():
     def run_comprehensive_scan_thread():
         nonlocal comprehensive_results, comp_error
         try:
-            if target_url:
-                comprehensive_results = run_comprehensive_scan(target_url)
-            else:
-                comprehensive_results = run_comprehensive_scan(target_url_basic)
+            comprehensive_results = run_comprehensive_scan(target_url)
         except Exception as e:
             comp_error = str(e)
             comprehensive_results = None

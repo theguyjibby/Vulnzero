@@ -12,7 +12,7 @@
       href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&family=Parkinsans:wght@300..800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./style.css" />
+    <link rel="stylesheet" href="/static/css/style.css" />
   </head>
   <style type="text/tailwindcss">
     @theme {
@@ -28,7 +28,7 @@
         <h1>Dashboard - Welcome,</h1>
         <button
           class="bg-text text-white px-6 py-2 rounded-lg"
-          onclick="window.location.href='/templates/home.html'"
+          onclick="window.location.href='/'"
         >
           Logout
         </button>
@@ -37,10 +37,19 @@
 
     <div class="scan-form flex flex-col justify-center items-center">
       <form
-        class="flex flex-col w-1/3 backdrop-blur-[2px] bg-neutral-300/20 border border-[#ebebeb] rounded-lg p-5"
+        class="flex flex-col w-2/5 backdrop-blur-[2px] bg-neutral-300/20 border border-[#ebebeb] rounded-lg p-5"
         id="scanForm"
       >
-        <h2 class="text-2xl font-semibold mb-5">New Vulnerability Scan</h2>
+        <div class="flex justify-between items-center mb-5">
+          <h2 class="text-2xl font-semibold">New Vulnerability Scan</h2>
+          <button
+            type="button"
+            id="historyButton"
+            class="cursor-pointer text-purp/75 hover:text-purp"
+          >
+            History
+          </button>
+        </div>
         <input
           type="text"
           id="target"
@@ -62,73 +71,302 @@
           Start Scan
         </button>
       </form>
-      <div id="scanMessage" class="mt-10 w-1/3"></div>
-      <div class="results w-1/3 mt-10" id="results"></div>
+      <div
+        id="spinner"
+        hidden
+        class="mt-10 flex flex-col items-center gap-3 text-purp"
+      >
+        <div
+          class="h-12 w-12 rounded-full border-4 border-purp/30 border-t-purp animate-spin"
+        ></div>
+        <p class="text-sm font-medium">
+          Running scan, this may take a few minutes...
+        </p>
+      </div>
+      <p id="scanMessage" class="mt-6 w-3/5 text-sm"></p>
+      <div
+        id="resultsContainer"
+        hidden
+        class="results w-3/5 mt-10 border border-neutral-200 rounded-xl p-5 bg-white/70"
+      >
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-semibold text-text">Scan Details</h3>
+          <button
+            id="closeResults"
+            class="text-sm text-purp/70 hover:text-purp font-semibold"
+            type="button"
+          >
+            Close ✕
+          </button>
+        </div>
+        <div id="results" class="space-y-4 text-sm"></div>
+      </div>
+      <div
+        id="historyContainer"
+        hidden
+        class="history w-3/5 mt-10 border border-neutral-200 rounded-xl p-5 bg-white/70"
+      >
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-semibold text-text">Past Scans</h3>
+          <button
+            id="closeHistory"
+            class="text-sm text-purp/70 hover:text-purp font-semibold"
+            type="button"
+          >
+            Close ✕
+          </button>
+        </div>
+        <div id="historyResults"></div>
+      </div>
     </div>
 
     <!-- Results -->
 
     <script type="module">
+      // Flask server URL - change this if your Flask server runs on a different port
       import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
 
-      // Flask server URL - change this if your Flask server runs on a different port
       const API_BASE_URL = "http://127.0.0.1:5000";
 
-      document
-        .getElementById("scanForm")
-        .addEventListener("submit", async function (e) {
-          e.preventDefault();
-          const target = document.getElementById("target").value;
-          const mode = document.getElementById("mode").value;
-          const messageDiv = document.getElementById("scanMessage");
-          const resultsDiv = document.getElementById("results");
+      const scanForm = document.getElementById("scanForm");
+      const messageDiv = document.getElementById("scanMessage");
+      const resultsContainer = document.getElementById("resultsContainer");
+      const resultsDiv = document.getElementById("results");
+      const spinner = document.getElementById("spinner");
+      const historyButton = document.getElementById("historyButton");
+      const historyContainer = document.getElementById("historyContainer");
+      const historyDiv = document.getElementById("historyResults");
+      const closeResultsButton = document.getElementById("closeResults");
+      const closeHistoryButton = document.getElementById("closeHistory");
+      let cachedScans = [];
 
-          messageDiv.textContent = "Scanning... This may take a few minutes.";
-          resultsDiv.innerHTML = "";
+      const renderAnalysisMarkup = (analysis) => {
+        if (!analysis) {
+          return '<p class="text-sm text-neutral-500">No AI analysis available for this scan.</p>';
+        }
 
-          try {
-            const response = await fetch(`${API_BASE_URL}/dashboard/targets`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              credentials: "include",
-              body: JSON.stringify({ target, mode }),
-            });
+        const rawReport =
+          typeof analysis === "string"
+            ? analysis
+            : analysis.raw_report || analysis.summary || "";
 
-            if (!response.ok) {
-              const errorText = await response.text();
-              console.error("Response error:", response.status, errorText);
-              messageDiv.textContent = `Error ${response.status}: ${
-                errorText || response.statusText
-              }`;
-              return;
-            }
+        if (typeof rawReport === "string" && rawReport.trim()) {
+          return marked.parse(rawReport);
+        }
 
-            const data = await response.json();
-            console.log("Scan response:", data);
+        return `<pre>${JSON.stringify(analysis, null, 2)}</pre>`;
+      };
 
-            if (data.status === "true") {
-              messageDiv.textContent = "Scan completed successfully!";
-              resultsDiv.innerHTML = marked.parse(`<h3>Scan Results</h3>
-                        <p><strong>Target:</strong> ${data.target}</p>
-                        <p><strong>IP:</strong> ${data.ip}</p>
-                        <p><strong>Subdomains Found:</strong> ${
-                          data.subdomains_found
-                        }</p>
-                        <p><strong>Subdirectories Found:</strong> ${
-                          data.subdirectories_found
-                        }</p>
-                        <p><strong>Total Vulnerabilities:</strong> ${
-                          data.total_vulnerabilities
-                        }</p>
-                        <pre>${JSON.stringify(data, null, 2)}</pre>`);
-            } else {
-              messageDiv.textContent = "Error: " + data.message;
-            }
-          } catch (error) {
-            console.error("Scan error:", error);
-            messageDiv.textContent = `Network error: ${error.message}. Make sure the Flask server is running.`;
+      const renderLiveScanResults = (data) => {
+        return `<h3 class="text-2xl font-semibold mb-4">Scan Results</h3>
+          <div class="space-y-2 text-sm">
+            <p><strong>Target:</strong> ${data.target}</p>
+            <p><strong>IP:</strong> ${data.ip}</p>
+            <p><strong>Subdomains Found:</strong> ${data.subdomains_found}</p>
+            <p><strong>Subdirectories Found:</strong> ${
+              data.subdirectories_found
+            }</p>
+            <p><strong>Total Vulnerabilities:</strong> ${
+              data.total_vulnerabilities
+            }</p>
+          </div>
+          <div class="raw-report prose prose-slate mt-4">
+            ${renderAnalysisMarkup(data.analysis)}
+          </div>`;
+      };
+
+      const renderHistoricalScanResults = (scan, analysis) => {
+        const timestamp = scan.scan_timestamp
+          ? new Date(scan.scan_timestamp).toLocaleString()
+          : "Unknown time";
+
+        return `<h3 class="text-2xl font-semibold mb-4">Scan Details</h3>
+          <div class="space-y-2 text-sm">
+            <p><strong>Target:</strong> ${scan.target_name} (${
+          scan.target_ip
+        })</p>
+            <p><strong>Scan Time:</strong> ${timestamp}</p>
+            <p><strong>Mode:</strong> ${scan.mode}</p>
+            <p><strong>Status:</strong> ${scan.status}</p>
+            <p><strong>Total Vulnerabilities:</strong> ${
+              scan.total_vulnerabilities
+            }</p>
+            <p><strong>Nikto Alerts:</strong> ${scan.nikto_alerts_count}</p>
+            <p><strong>Comprehensive Vulns:</strong> ${
+              scan.comprehensive_vulns_count
+            }</p>
+          </div>
+          <div class="raw-report prose prose-slate mt-4">
+            ${renderAnalysisMarkup(analysis)}
+          </div>`;
+      };
+
+      scanForm?.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const target = document.getElementById("target").value;
+        const mode = document.getElementById("mode").value;
+        if (!messageDiv || !resultsDiv || !spinner) return;
+        messageDiv.textContent = "";
+        resultsDiv.innerHTML = "";
+        resultsContainer.hidden = false;
+        spinner.hidden = false;
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/dashboard/targets`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ target, mode }),
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Response error:", response.status, errorText);
+            spinner.hidden = true;
+            messageDiv.textContent = `Error ${response.status}: ${
+              errorText || response.statusText
+            }`;
+            return;
           }
-        });
+
+          const data = await response.json();
+          console.log("Scan response:", data);
+
+          if (data.status === "true") {
+            spinner.hidden = true;
+            messageDiv.textContent = "Scan completed successfully!";
+            resultsDiv.innerHTML = renderLiveScanResults(data);
+          } else {
+            spinner.hidden = true;
+            messageDiv.textContent = "Error: " + data.message;
+          }
+        } catch (error) {
+          console.error("Scan error:", error);
+          spinner.hidden = true;
+          messageDiv.textContent = `Network error: ${error.message}. Make sure the Flask server is running.`;
+        }
+      });
+
+      historyButton?.addEventListener("click", async () => {
+        if (!historyDiv) return;
+        historyButton.disabled = true;
+        historyContainer.hidden = false;
+        const previousContent = historyDiv.innerHTML;
+        historyDiv.innerHTML =
+          '<p class="text-sm text-neutral-500">Loading history...</p>';
+
+        try {
+          const response = await fetch(
+            `${API_BASE_URL}/dashboard/analyzed-scans`,
+            {
+              method: "GET",
+              credentials: "include",
+            }
+          );
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || response.statusText);
+          }
+
+          const historyData = await response.json();
+          const scans = historyData.scans || [];
+
+          if (!scans.length) {
+            historyDiv.innerHTML =
+              '<p class="text-sm text-neutral-500">No past scans yet.</p>';
+            return;
+          }
+
+          cachedScans = scans;
+
+          const items = scans
+            .map((scan, index) => {
+              const timestamp = scan.scan_timestamp
+                ? new Date(scan.scan_timestamp).toLocaleString()
+                : "Unknown time";
+              return `
+                <li
+                  class="border border-neutral-200 rounded-lg p-4 flex flex-col gap-1 bg-white/60 cursor-pointer hover:border-purp transition"
+                  data-scan-id="${scan.scan_id}"
+                  data-scan-index="${index}"
+                  role="button"
+                  tabindex="0"
+                >
+                  <div class="flex justify-between text-sm text-neutral-600">
+                    <span>${timestamp}</span>
+                    <span class="uppercase tracking-wide text-xs font-semibold text-purp">${scan.mode}</span>
+                  </div>
+                  <p class="font-semibold">${scan.target_name} · ${scan.target_ip}</p>
+                  <p class="text-sm text-neutral-600">Total vulnerabilities: ${scan.total_vulnerabilities}</p>
+                  <p class="text-xs text-neutral-500">Nikto alerts: ${scan.nikto_alerts_count} • Comprehensive vulns: ${scan.comprehensive_vulns_count}</p>
+                  <span class="text-xs text-purp mt-2 inline-flex items-center gap-1">View details →</span>
+                </li>
+              `;
+            })
+            .join("");
+
+          historyDiv.innerHTML = `<ul class="flex flex-col gap-3">${items}</ul>`;
+        } catch (error) {
+          console.error("History fetch error:", error);
+          historyDiv.innerHTML = `<p class="text-sm text-red-500">Unable to load history: ${error.message}</p>`;
+        } finally {
+          historyButton.disabled = false;
+          if (!historyDiv.innerHTML.trim()) {
+            historyDiv.innerHTML = previousContent;
+          }
+        }
+      });
+
+      historyDiv?.addEventListener("click", async (event) => {
+        const item = event.target.closest("[data-scan-id]");
+        if (!item) return;
+
+        const scanIndex = Number(item.dataset.scanIndex);
+        const scanId = item.dataset.scanId;
+
+        if (!scanId || Number.isNaN(scanIndex) || !cachedScans[scanIndex]) {
+          return;
+        }
+
+        resultsDiv.innerHTML =
+          '<p class="text-sm text-neutral-500">Loading scan details...</p>';
+        resultsContainer.hidden = false;
+
+        try {
+          const response = await fetch(
+            `${API_BASE_URL}/dashboard/analyzed-scans/${scanId}`,
+            {
+              method: "GET",
+              credentials: "include",
+            }
+          );
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || response.statusText);
+          }
+
+          const analysis = await response.json();
+          resultsDiv.innerHTML = renderHistoricalScanResults(
+            cachedScans[scanIndex],
+            analysis
+          );
+        } catch (error) {
+          console.error("Scan detail fetch error:", error);
+          resultsDiv.innerHTML = `<p class="text-sm text-red-500">Unable to load scan details: ${error.message}</p>`;
+        }
+      });
+
+      closeResultsButton?.addEventListener("click", () => {
+        resultsDiv.innerHTML = "";
+        resultsContainer.hidden = true;
+      });
+
+      closeHistoryButton?.addEventListener("click", () => {
+        historyDiv.innerHTML = "";
+        historyContainer.hidden = true;
+      });
     </script>
   </body>
 </html>
